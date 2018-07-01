@@ -1,23 +1,30 @@
 <template>
     <div class="background" id="passwords-create-new">
         <div class="window">
-            <div class="title" :style="getTitleStyle">
-                <translate :say="title"/>
-                <i class="fa fa-times close" @click="closeWindow()"></i>
+            <div class="title">
+                <icon icon="star" class="favorite" :class="{active:password.favorite}" title="Mark as favorite" @click.native="toggleFavorite"/>
+                <field type="text" placeholder="Name" name="label" maxlength="64" v-model="password.label"/>
+                <icon icon="times" class="close" title="Close window" @click.native="closeWindow"/>
             </div>
-            <form class="content" v-on:submit.prevent="submitAction()">
-                <div class="form left">
-                    <translate tag="div" class="section-title" :style="getSectionStyle" say="Properties"/>
-                    <div class="form-grid">
-                        <translate tag="label" for="password-username" say="Username"/>
-                        <input id="password-username" type="text" name="username" maxlength="64" v-model="password.username">
-                        <translate tag="label" for="password-password" say="Password"/>
+            <div class="content">
+                <div class="properties-base">
+                    <icon tag="label" for="password-username" icon="user"/>
+                    <field type="text" id="password-username" placeholder="Username" name="username" maxlength="64" v-model="password.username"/>
+                    <icon tag="label" for="password-password" icon="key"/>
+                    <div class="password-container">
                         <div class="password-field">
                             <div class="icons">
                                 <translate tag="i" class="fa" :class="{ 'fa-eye': showPassword, 'fa-eye-slash': !showPassword }" @click="togglePasswordVisibility()" title="Toggle visibility"/>
                                 <translate tag="i" class="fa fa-refresh" :class="{ 'fa-spin': showLoader }" @click="generateRandomPassword()" title="Generate password"/>
                             </div>
-                            <input id="password-password" :type="showPassword ? 'text':'password'" name="password" pattern=".{0,256}" v-model="password.password" required readonly>
+                            <field :type="showPassword ? 'text':'password'"
+                                   id="password-password"
+                                   placeholder="Password"
+                                   name="password"
+                                   pattern=".{0,256}"
+                                   v-model="password.password"
+                                   required
+                                   readonly/>
                         </div>
                         <div class="settings" :class="{active: generator.active}">
                             <input id="password-password-numbers" type="checkbox" v-model="generator.numbers"/>
@@ -25,14 +32,16 @@
                             <input id="password-password-special" type="checkbox" v-model="generator.special"/>
                             <translate tag="label" for="password-password-special" say="Special Characters"/>
                         </div>
-                        <translate tag="label" for="password-label" say="Name"/>
-                        <input id="password-label" type="text" name="label" maxlength="64" v-model="password.label">
-                        <translate tag="label" for="password-url" say="Website"/>
-                        <input id="password-url" type="text" name="url" maxlength="2048" v-model="password.url">
-                        <!-- <passwords-tags></passwords-tags> -->
                     </div>
                 </div>
-                <div class="form right">
+                <div class="properties-extra">
+                    <icon tag="label" for="password-url" icon="globe"/>
+                    <field type="text" id="password-url" placeholder="Website" name="url" maxlength="2048" v-model="password.url"/>
+                    <icon tag="label" for="password-tags" icon="tags"/>
+                    <field type="text" id="password-tags" placeholder="Tags" name="tags" v-model="password.tags"/>
+                </div>
+
+                <div class="foldouts">
                     <foldout title="Notes" :initially-open="notesOpen">
                         <div class="notes-container">
                             <translate tag="div" class="warning" say="You have reached the maximum length of 4096 characters" v-if="password.notes.length > 4095"/>
@@ -42,21 +51,11 @@
                     <foldout title="Custom Fields">
                         <custom-fields :fields="password.customFields" @updated="updateCustomFields"/>
                     </foldout>
-                    <foldout title="More Options">
-                        <div class="form-grid">
-                            <translate tag="label" for="password-favorite" say="Favorite"/>
-                            <input id="password-favorite" name="favorite" type="checkbox" v-model="password.favorite">
-                            <translate tag="label" for="password-cse" say="Encryption"/>
-                            <select id="password-cse" name="cseType" title="There is only one option right now" v-model="password.cseType" disabled>
-                                <translate tag="option" value="none" say="On the server"/>
-                            </select>
-                        </div>
-                    </foldout>
                 </div>
                 <div class="controls">
                     <translate tag="input" type="submit" value="Save"/>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </template>
@@ -66,11 +65,13 @@
     import Foldout from '@vc/Foldout';
     import Translate from '@vc/Translate';
     import Utility from '@js/Classes/Utility';
-    import Messages from "@js/Classes/Messages";
+    import Messages from '@js/Classes/Messages';
     import Localisation from '@js/Classes/Localisation';
-    import EnhancedApi from "@js/ApiClient/EnhancedApi";
+    import EnhancedApi from '@js/ApiClient/EnhancedApi';
     import ThemeManager from '@js/Manager/ThemeManager';
     import CustomFields from '@vue/Dialog/CreatePassword/CustomFields';
+    import Field from '@vc/Form/Field';
+    import Icon from '@vc/Icon';
 
     export default {
         data() {
@@ -81,12 +82,14 @@
                 showLoader  : false,
                 simplemde   : null,
                 generator   : {numbers: undefined, special: undefined, active: false},
-                password    : {cseType: 'none', notes: '', customFields: {}},
+                password    : {favorite: false, cseType: 'none', notes: '', customFields: {}},
                 _success    : null
             };
         },
 
         components: {
+            Icon,
+            Field,
             Foldout,
             Translate,
             CustomFields
@@ -102,12 +105,6 @@
         },
 
         computed: {
-            getTitleStyle() {
-                return {
-                    color          : ThemeManager.getContrastColor(),
-                    backgroundColor: ThemeManager.getColor()
-                };
-            },
             getSectionStyle() {
                 return {
                     borderColor: ThemeManager.getColor()
@@ -116,6 +113,9 @@
         },
 
         methods: {
+            toggleFavorite() {
+                this.password.favorite = !this.password.favorite;
+            },
             closeWindow() {
                 this.$destroy();
                 let container = document.getElementById('app-popup'),
@@ -218,8 +218,8 @@
 <style lang="scss">
     @import "~simplemde/dist/simplemde.min.css";
 
-    #app-popup {
-        .background {
+    #passwords-create-new {
+        &.background {
             position         : fixed;
             top              : 0;
             left             : 0;
@@ -247,13 +247,30 @@
                 align-items           : stretch;
 
                 .title {
-                    grid-area : title;
-                    padding   : 1rem;
-                    font-size : 1.25rem;
+                    grid-area             : title;
+                    display               : grid;
+                    grid-template-columns : 2.5rem 1fr 3rem;
+                    font-size             : 1.25rem;
+
+                    .favorite {
+                        cursor     : pointer;
+                        transition : color 0.15s ease-in-out;
+                        padding    : 1rem .75rem;
+
+                        &.active {
+                            color : $color-yellow;
+                        }
+                    }
+
+                    input {
+                        font-size : 1.5rem;
+                        width     : 100%;
+                        padding   : .5rem .25rem;
+                    }
 
                     .close {
-                        float  : right;
-                        cursor : pointer;
+                        cursor  : pointer;
+                        padding : 1rem;
                     }
                 }
 
@@ -274,174 +291,236 @@
             }
         }
 
-        #passwords-create-new {
-            .content {
+        input {
+            font-size    : 1rem;
+            font-weight  : 300;
+            border-color : transparent;
+            transition   : border-color .10s ease-in-out;
+
+            &:hover {
+                border-color : #dbdbdb;
+            }
+
+            &:focus,
+            &:active {
+                border-color : #0082c9;
+            }
+        }
+
+        .content {
+            display               : grid;
+            grid-template-columns : 1fr 1fr;
+            grid-template-areas   : "base extra" "foldout foldout" ". controls";
+            grid-column-gap       : 2rem;
+            grid-template-rows    : min-content;
+            padding               : 15px;
+
+            .properties-base,
+            .properties-extra {
+                grid-area             : base;
                 display               : grid;
-                grid-template-columns : 1fr 1fr;
-                grid-template-rows    : 9fr 1fr;
-                grid-template-areas   : "left right" "controls right";
-                grid-column-gap       : 15px;
-                padding               : 15px;
+                grid-template-columns : 1.5rem 1fr;
+                font-size             : 1rem;
+                grid-template-rows    : 2rem 2rem 2rem;
+                grid-row-gap          : 1rem;
 
-                .form {
-                    grid-area : left;
+                label {
+                    padding : .5rem .5rem .5rem 0;
+                }
 
-                    .form-grid {
-                        display               : grid;
-                        grid-template-columns : auto 3fr;
-                        grid-template-rows    : 1fr;
-                        grid-row-gap          : 5px;
-                        justify-items         : left;
-                        align-items           : end;
+                input {
+                    width   : 100%;
+                    margin  : 0;
+                    padding : 0.25rem;
 
-                        .tags-container,
-                        .foldout-container {
-                            grid-column  : 1 / span 2;
-                            justify-self : stretch;
-                        }
+                    &[type=checkbox] {
+                        width   : auto;
+                        display : inline-block;
+                    }
+                }
 
-                        label {
-                            padding : 0 0.9rem 5px 0;
-                            cursor  : pointer;
+                .password-container {
+                    grid-row-start    : 2;
+                    grid-row-end      : 3;
+                    grid-column-start : 2;
+                }
+
+                .password-field {
+                    display  : block;
+                    width    : 100%;
+                    position : relative;
+
+                    input {
+                        max-width     : initial;
+                        padding-right : 45px;
+
+                        &[type=text] {
+                            font-family : 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', monospace;
+                            font-weight : 300;
                         }
                     }
 
-                    .section-title {
-                        font-size     : 1.1rem;
-                        padding       : 0 0 0.25rem 0;
-                        border-bottom : 1px solid $color-grey-light;
+                    .icons {
+                        position    : absolute;
+                        top         : 0;
+                        right       : 3px;
+                        bottom      : 0;
+                        display     : flex;
+                        align-items : center;
+
+                        i {
+                            font-size  : 1rem;
+                            cursor     : pointer;
+                            margin     : 3px;
+                            opacity    : 0;
+                            transition : opacity .1s ease-in-out;
+                        }
                     }
 
-                    .password-field {
-                        display   : block;
-                        width     : 100%;
-                        max-width : 275px;
-                        position  : relative;
+                    &:hover .icons i {
+                        opacity : 1;
+                    }
+                }
 
-                        input {
-                            max-width     : initial;
-                            padding-right : 45px;
-                            font-family   : 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', monospace;
-                        }
+                .settings {
+                    grid-column-start : 2;
+                    grid-column-end   : 3;
+                    line-height       : 30px;
+                    display           : flex;
+                    overflow          : hidden;
+                    max-height        : 0;
+                    transition        : max-height 0.25s ease-in-out;
 
-                        .icons {
-                            position    : absolute;
-                            top         : 0;
-                            right       : 3px;
-                            bottom      : 0;
-                            display     : flex;
-                            align-items : center;
+                    &.active {
+                        max-height : 60px;
+                    }
 
-                            i.fa {
-                                font-size : 1rem;
-                                cursor    : pointer;
-                                margin    : 3px;
-                            }
-                        }
+                    input {
+                        margin : 0;
                     }
 
                     label {
-                        display   : block;
-                        font-size : 0.9rem;
+                        padding     : 0 10px 0 5px;
+                        font-weight : 300;
+                    }
+                }
+            }
+
+            .properties-extra {
+                grid-area : extra;
+            }
+
+            .foldouts {
+                grid-area : foldout;
+
+                .notes-container {
+                    border        : 1px solid #dbdbdb;
+                    border-radius : 3px;
+                    transition    : border-color .10s ease-in-out;
+                    margin-bottom : 1px;
+
+                    &:hover {
+                        border-color : #0082c9;
                     }
 
-                    input[type=text],
-                    input[type=password] {
-                        cursor    : text;
-                        width     : 100%;
-                        max-width : 275px;
-                    }
+                    .editor-toolbar {
+                        padding       : 0;
+                        border-top    : none;
+                        border-left   : none;
+                        border-right  : none;
+                        opacity       : 1;
+                        margin-top    : 0;
+                        margin-bottom : 0;
 
-                    input[type=checkbox] {
-                        cursor : pointer;
-                    }
-
-                    select {
-                        width     : 100%;
-                        max-width : 275px;
-                    }
-
-                    textarea {
-                        opacity : 0;
-                    }
-
-                    .settings {
-                        grid-column-start : 2;
-                        grid-column-end   : 3;
-                        line-height       : 30px;
-                        display           : flex;
-                        overflow          : hidden;
-                        max-height        : 0;
-                        transition        : max-height 0.25s ease-in-out;
-
-                        &.active {
-                            max-height : 60px;
+                        &:before {
+                            line-height : 0;
                         }
 
-                        input {
-                            margin : 0;
-                        }
+                        a {
+                            padding   : 0 .5rem;
+                            font-size : 1rem;
+                            width     : auto;
+                            height    : auto;
+                            border    : none;
 
-                        label {
-                            padding : 0 10px 0 5px;
-                        }
-                    }
-
-                    &.right {
-                        grid-area  : right;
-                        overflow-y : auto;
-
-                        .notes-container {
-                            padding : 0.25em 0;
-
-                            .CodeMirror-scroll {
-                                overflow   : auto !important;
-                                min-height : 300px;
-                                max-height : 300px;
-                            }
-
-                            .editor-preview.editor-preview-active p {
-                                margin-bottom : 1em;
-                            }
-
-                            .warning {
-                                margin : 0 0 4px;
+                            &:hover {
+                                background-color : transparent;
+                                border           : none;
                             }
                         }
 
-                        .foldout-container {
-                            transition : padding-bottom 0.1s ease-in-out;
+                        i.separator {
+                            opacity : 0;
+                        }
+                    }
 
-                            &.open {
-                                padding-bottom : 1.25rem;
-                            }
+                    .CodeMirror {
+                        border  : none;
+                        padding : 0;
+                    }
 
-                            &.first-open {
-                                transition : none;
-                            }
+                    .CodeMirror-scroll {
+                        overflow       : auto !important;
+                        min-height     : 300px;
+                        max-height     : 300px;
+                        font-size      : 1rem;
+                        padding-bottom : 0;
+                        font-weight    : 300;
+                    }
+
+                    .editor-preview.editor-preview-active {
+                        font-size   : 1rem;
+                        font-weight : 300;
+                        padding     : 0 .5rem;
+
+                        p {
+                            margin-bottom : 1em;
                         }
 
+                        em {
+                            font-style : italic;
+                        }
+
+                        strong {
+                            font-weight : bold;
+                        }
+
+                        h1 {
+                            font-size   : 200%;
+                            line-height : 200%;
+                        }
+                    }
+
+                    .warning {
+                        margin : 0 0 4px;
                     }
                 }
 
-                .controls {
-                    grid-area  : controls;
-                    align-self : end;
+                .foldout-container {
+                    margin-bottom : 1.25rem;
 
-                    input {
-                        width     : 100%;
-                        font-size : 1.1rem;
+                    &.first-open {
+                        transition : none;
+                    }
+
+                    .foldout-title {
+                        font-weight : 300;
+                        font-size   : 1.25rem
                     }
                 }
 
-                @media (max-width : $width-extra-small) {
-                    display : block;
+            }
 
-                    .form.left {
-                        padding-bottom : 1.25rem;
-                    }
+            .controls {
+                grid-area  : controls;
+                align-self : end;
+
+                input {
+                    width     : 100%;
+                    font-size : 1.1rem;
                 }
             }
         }
     }
+
 </style>

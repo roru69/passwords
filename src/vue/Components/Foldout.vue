@@ -1,13 +1,14 @@
 <template>
     <div :class="{open:open,'first-open':firstOpen}" class="foldout-container">
-        <translate tag="div" class="foldout-title" icon="chevron-right" @click="toggleContent()" :style="titleStyle" :say="title"/>
-        <div class="foldout-content" :style="contentStyle"><slot/></div>
+        <translate tag="div" class="foldout-title" :icon="open ? 'minus':'plus'" @click="toggleContent" :say="title"/>
+        <div class="foldout-content" :style="contentStyle">
+            <slot/>
+        </div>
     </div>
 </template>
 
 <script>
     import Translate from '@vc/Translate.vue';
-    import ThemeManager from '@js/Manager/ThemeManager';
 
     export default {
         components: {
@@ -27,10 +28,10 @@
 
         data() {
             return {
-                observer   : null,
-                maxHeight  : 0,
-                open       : false,
-                firstOpen  : true
+                observer : null,
+                maxHeight: 0,
+                open     : false,
+                firstOpen: true
             };
         },
 
@@ -45,20 +46,12 @@
         },
 
         computed: {
-            titleStyle() {
-                if(this.open) {
-                    return {
-                        borderColor: ThemeManager.getColor()
-                    };
-                }
-
-                return {};
-            },
             contentStyle() {
-                this.maxHeight = 0;
                 if(this.open) {
                     let $el = this.$slots.default[0].elm;
-                    if($el) this.maxHeight = $el.offsetHeight;
+                    if($el) this.maxHeight = $el.offsetHeight +1 ;
+                } else {
+                    this.maxHeight = 0;
                 }
 
                 return {maxHeight: this.maxHeight.toString() + 'px'};
@@ -77,18 +70,9 @@
 <style lang="scss">
     .foldout-container {
         .foldout-title {
-            cursor        : pointer;
-            font-size     : 1.1rem;
-            padding       : 0 0 0.25rem 0;
-            border-bottom : 1px solid transparent;
-            transition    : border-color 0.25s ease-in-out;
-
-            .fa-chevron-right {
-                cursor      : pointer;
-                font-size   : 0.9rem;
-                margin-left : 3px;
-                transition  : transform 0.25s ease-in-out;
-            }
+            cursor    : pointer;
+            font-size : 1.1rem;
+            padding   : 0 0 0.25rem 0;
 
             span {
                 cursor : pointer;
@@ -101,15 +85,6 @@
             transition : max-height 0.25s ease-in-out;
         }
 
-        &.open {
-            .foldout-title {
-                border-color : $color-grey-light;
-
-                .fa-chevron-right {
-                    transform : rotate(90deg);
-                }
-            }
-        }
         &.first-open .foldout-content {
             transition : none;
         }
