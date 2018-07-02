@@ -7,7 +7,6 @@
                            v-for="(field, index) in getFields"
                            :key="index"
                            :is-blank="field === undefined">
-            <hr v-if="index !== getFields.length-1">
         </custom-field-form>
     </div>
 </template>
@@ -114,10 +113,9 @@
 
 <style lang="scss">
     #app-popup #passwords-create-new #custom-fields {
-        hr {
-            color      : transparent;
-            border     : none;
-            border-top : 1px solid $color-grey-light;
-        }
+        display               : grid;
+        grid-template-columns : 1fr 1fr;
+        grid-column-gap       : 1rem;
+        grid-row-gap          : 1rem;
     }
 </style>

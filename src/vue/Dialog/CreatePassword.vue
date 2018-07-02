@@ -31,6 +31,13 @@
                             <translate tag="label" for="password-password-numbers" say="Numbers"/>
                             <input id="password-password-special" type="checkbox" v-model="generator.special"/>
                             <translate tag="label" for="password-password-special" say="Special Characters"/>
+                            <translate tag="label" for="password-password-level" say="Length"/>
+                            <select>
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                            </select>
                         </div>
                     </div>
                 </div>

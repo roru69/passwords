@@ -1,6 +1,7 @@
 <template>
     <div class="custom-field-form">
         <input type="text" :placeholder="namePlaceholder" class="field-name" v-model="name" maxlength="48" :class="{error:showNameError}"/>
+        <input type="button" class="fa fa-trash field-button" @click="deleteField" :disabled="!isValidName" value=""/>
         <select class="field-type" v-model="type" :disabled="!isValidName">
             <translate tag="option" value="text">Text</translate>
             <translate tag="option" value="secret">Secret</translate>
@@ -18,8 +19,6 @@
                :disabled="!isValidName"
                :pattern="getPattern"
                required/>
-        <input type="button" class="fa fa-trash field-button" @click="deleteField" :disabled="!isValidName" value=""/>
-        <slot></slot>
     </div>
 </template>
 
@@ -150,9 +149,14 @@
 
 <style lang="scss">
     #app-popup #passwords-create-new #custom-fields .custom-field-form {
+        display: grid;
+        grid-template-areas: "name name delete" "type value value";
+        grid-template-columns: 10rem 1fr 3rem;
+
         .field-name {
-            width     : 75.5%;
+            grid-area: name;
             max-width : none;
+            width: 100%;
 
             &.error {
                 border : 1px solid $color-red;
@@ -160,14 +164,15 @@
         }
 
         .field-type {
-            width     : 23%;
+            grid-area: type;
             max-width : none;
         }
 
         .field-value,
         .file-picker {
-            width     : 92.5%;
+            grid-area: value;
             max-width : none;
+            width: 100%;
         }
 
         .file-picker {
@@ -182,7 +187,7 @@
         }
 
         .field-button {
-            width     : 6%;
+            grid-area: delete;
             max-width : none;
         }
 
