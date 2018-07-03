@@ -1,9 +1,9 @@
 <template>
     <div class="background" id="passwords-create-new">
         <div class="window">
-            <div class="title">
+            <div class="title" :style="getTitleStyle">
                 <icon icon="star" class="favorite" :class="{active:password.favorite}" title="Mark as favorite" @click.native="toggleFavorite"/>
-                <field type="text" placeholder="Name" name="label" maxlength="64" v-model="password.label"/>
+                <field type="text" placeholder="Name" name="label" maxlength="64" v-model="password.label" :style="getTitleStyle"/>
                 <icon icon="times" class="close" title="Close window" @click.native="closeWindow"/>
             </div>
             <div class="content">
@@ -45,7 +45,7 @@
                     <icon tag="label" for="password-url" icon="globe"/>
                     <field type="text" id="password-url" placeholder="Website" name="url" maxlength="2048" v-model="password.url"/>
                     <icon tag="label" for="password-tags" icon="tags"/>
-                    <field type="text" id="password-tags" placeholder="Tags" name="tags" v-model="password.tags"/>
+                    <tags :password="password"/>
                 </div>
 
                 <div class="foldouts">
@@ -79,6 +79,7 @@
     import CustomFields from '@vue/Dialog/CreatePassword/CustomFields';
     import Field from '@vc/Form/Field';
     import Icon from '@vc/Icon';
+    import Tags from "@/vue/Components/Tags";
 
     export default {
         data() {
@@ -95,6 +96,7 @@
         },
 
         components: {
+            Tags,
             Icon,
             Field,
             Foldout,
@@ -112,9 +114,10 @@
         },
 
         computed: {
-            getSectionStyle() {
+            getTitleStyle() {
                 return {
-                    borderColor: ThemeManager.getColor()
+                    color          : ThemeManager.getContrastColor(),
+                    backgroundColor: ThemeManager.getColor()
                 };
             }
         },
@@ -143,17 +146,17 @@
                 }
 
                 API.generatePassword(undefined, numbers, special)
-                   .then((d) => {
-                       this.password.password = d.password;
-                       if(this.generator.active === false) {
-                           this.generator = {numbers: d.numbers, special: d.special, active: true};
-                       }
-                       this.showPassword = true;
-                       this.showLoader = false;
-                   })
-                   .catch(() => {
-                       this.showLoader = false;
-                   });
+                    .then((d) => {
+                        this.password.password = d.password;
+                        if(this.generator.active === false) {
+                            this.generator = {numbers: d.numbers, special: d.special, active: true};
+                        }
+                        this.showPassword = true;
+                        this.showLoader = false;
+                    })
+                    .catch(() => {
+                        this.showLoader = false;
+                    });
             },
             updateCustomFields($event) {
                 this.password.customFields = $event;
@@ -270,9 +273,10 @@
                     }
 
                     input {
-                        font-size : 1.5rem;
-                        width     : 100%;
-                        padding   : .5rem .25rem;
+                        font-size  : 1.5rem;
+                        width      : 100%;
+                        padding    : .5rem .25rem;
+                        background : transparent;
                     }
 
                     .close {
@@ -299,19 +303,9 @@
         }
 
         input {
-            font-size    : 1rem;
-            font-weight  : 300;
-            border-color : transparent;
-            transition   : border-color .10s ease-in-out;
-
-            &:hover {
-                border-color : #dbdbdb;
-            }
-
-            &:focus,
-            &:active {
-                border-color : #0082c9;
-            }
+            font-size   : 1rem;
+            font-weight : 300;
+            border      : none;
         }
 
         .content {
@@ -415,6 +409,18 @@
 
             .properties-extra {
                 grid-area : extra;
+
+                .tags-container {
+                    font-weight : 300;
+
+                    .tag {
+                        padding : 0.25rem;
+                    }
+
+                    input {
+                        width : auto;
+                    }
+                }
             }
 
             .foldouts {

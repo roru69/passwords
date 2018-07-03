@@ -73,7 +73,7 @@
         methods: {
             loadTags       : function() {
                 API.listTags()
-                   .then((t) => { this.allTags = Utility.objectToArray(t); });
+                    .then((t) => { this.allTags = Utility.objectToArray(t); });
             },
             keyUpAction    : function($e) {
                 let key = $e.keyCode;
@@ -131,10 +131,10 @@
                 }
 
                 TagManager.createTagFromData({label: label})
-                          .then((tag) => {
-                              this.allTags.push(tag);
-                              this.addTag(tag);
-                          });
+                    .then((tag) => {
+                        this.allTags.push(tag);
+                        this.addTag(tag);
+                    });
             },
             removeLastTag  : function() {
                 this.tags.pop();
@@ -233,13 +233,15 @@
         .tag-search {
             position      : absolute;
             border-radius : 2px;
-            max-height    : 120px;
+            max-height    : 175px;
+            min-width     : 175px;
             overflow-y    : auto;
-            z-index       : 1;
+            z-index       : 2;
 
             .result {
-                padding : 3px 5px;
-                cursor  : pointer;
+                padding     : 3px 5px;
+                cursor      : pointer;
+                white-space : nowrap;
 
                 .fa {
                     margin-right : 5px;
