@@ -31,8 +31,8 @@
                             <translate tag="label" for="password-password-numbers" say="Numbers"/>
                             <input id="password-password-special" type="checkbox" v-model="generator.special"/>
                             <translate tag="label" for="password-password-special" say="Special Characters"/>
-                            <translate tag="label" for="password-password-level" say="Length"/>
-                            <select>
+                            <translate tag="label" for="password-password-strength" say="Strength"/>
+                            <select id="password-password-strength" v-model="generator.strength">
                                 <option>1</option>
                                 <option>2</option>
                                 <option>3</option>
@@ -89,7 +89,7 @@
                 showPassword: false,
                 showLoader  : false,
                 simplemde   : null,
-                generator   : {numbers: undefined, special: undefined, active: false},
+                generator   : {numbers: undefined, special: undefined, strength: 0, active: false},
                 password    : {favorite: false, cseType: 'none', notes: '', customFields: {}},
                 _success    : null
             };
@@ -138,18 +138,19 @@
             generateRandomPassword() {
                 if(this.showLoader) return;
                 this.showLoader = true;
-                let numbers = undefined, special = undefined;
+                let numbers = undefined, special = undefined, strength = undefined;
 
                 if(this.generator.active) {
+                    strength = this.generator.strength;
                     numbers = this.generator.numbers;
                     special = this.generator.special;
                 }
 
-                API.generatePassword(undefined, numbers, special)
+                API.generatePassword(strength, numbers, special)
                     .then((d) => {
                         this.password.password = d.password;
                         if(this.generator.active === false) {
-                            this.generator = {numbers: d.numbers, special: d.special, active: true};
+                            this.generator = {numbers: d.numbers, special: d.special, strength: d.strength, active: true};
                         }
                         this.showPassword = true;
                         this.showLoader = false;
@@ -219,6 +220,9 @@
                 if(oldValue !== undefined) this.generateRandomPassword();
             },
             'generator.special'(value, oldValue) {
+                if(oldValue !== undefined) this.generateRandomPassword();
+            },
+            'generator.strength'(value, oldValue) {
                 if(oldValue !== undefined) this.generateRandomPassword();
             }
         }
@@ -322,7 +326,7 @@
                 display               : grid;
                 grid-template-columns : 1.5rem 1fr;
                 font-size             : 1rem;
-                grid-template-rows    : 2rem 2rem 2rem;
+                grid-template-rows    : 2rem 6rem;
                 grid-row-gap          : 1rem;
 
                 label {
@@ -338,12 +342,6 @@
                         width   : auto;
                         display : inline-block;
                     }
-                }
-
-                .password-container {
-                    grid-row-start    : 2;
-                    grid-row-end      : 3;
-                    grid-column-start : 2;
                 }
 
                 .password-field {
@@ -373,13 +371,13 @@
                             font-size  : 1rem;
                             cursor     : pointer;
                             margin     : 3px;
-                            opacity    : 0;
+                            opacity    : .25;
                             transition : opacity .1s ease-in-out;
-                        }
-                    }
 
-                    &:hover .icons i {
-                        opacity : 1;
+                            &:hover {
+                                opacity : 1;
+                            }
+                        }
                     }
                 }
 
@@ -401,8 +399,9 @@
                     }
 
                     label {
-                        padding     : 0 10px 0 5px;
-                        font-weight : 300;
+                        padding: 0 .5rem;
+                        font-weight: 300;
+                        line-height: 2.5rem;
                     }
                 }
             }
