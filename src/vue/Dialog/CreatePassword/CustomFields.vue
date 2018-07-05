@@ -5,6 +5,7 @@
                            @deleted="deleteField"
                            @updated="updateField"
                            v-for="(field, index) in getFields"
+                           :id="index+1"
                            :key="index"
                            :is-blank="field === undefined">
         </custom-field-form>

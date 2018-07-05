@@ -1,5 +1,6 @@
 <template>
     <div class="custom-field-form">
+        <span class="field-id">#{{id}}</span>
         <input type="text" :placeholder="namePlaceholder" class="field-name" v-model="name" maxlength="48" :class="{error:showNameError}"/>
         <input type="button" class="fa fa-trash field-button" @click="deleteField" :disabled="!isValidName" value=""/>
         <select class="field-type" v-model="type" :disabled="!isValidName">
@@ -47,6 +48,9 @@
                 'default': () => {
                     return [];
                 }
+            },
+            id   : {
+                type     : Number
             },
             isBlank   : {
                 type     : Boolean,
@@ -150,8 +154,14 @@
 <style lang="scss">
     #app-popup #passwords-create-new #custom-fields .custom-field-form {
         display: grid;
-        grid-template-areas: "name name delete" "type value value";
-        grid-template-columns: 10rem 1fr 3rem;
+        grid-template-areas: "id name name delete" "type type value value";
+        grid-template-columns: 1.5rem 5.5rem 1fr 3rem;
+
+        .field-id {
+            padding: 1rem 0;
+            font-weight: bold;
+            font-size: 1rem;
+        }
 
         .field-name {
             grid-area: name;

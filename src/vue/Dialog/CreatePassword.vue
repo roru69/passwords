@@ -107,10 +107,7 @@
         mounted() {
             this.loadSimpleMde();
             document.getElementById('password-username').focus();
-            setTimeout(
-                () => {document.getElementById('password-password').removeAttribute('readonly');},
-                250
-            );
+            setTimeout(() => {document.getElementById('password-password').removeAttribute('readonly');}, 250);
         },
 
         computed: {
@@ -147,17 +144,17 @@
                 }
 
                 API.generatePassword(strength, numbers, special)
-                    .then((d) => {
-                        this.password.password = d.password;
-                        if(this.generator.active === false) {
-                            this.generator = {numbers: d.numbers, special: d.special, strength: d.strength, active: true};
-                        }
-                        this.showPassword = true;
-                        this.showLoader = false;
-                    })
-                    .catch(() => {
-                        this.showLoader = false;
-                    });
+                   .then((d) => {
+                       this.password.password = d.password;
+                       if(this.generator.active === false) {
+                           this.generator = {numbers: d.numbers, special: d.special, strength: d.strength, active: true};
+                       }
+                       this.showPassword = true;
+                       this.showLoader = false;
+                   })
+                   .catch(() => {
+                       this.showLoader = false;
+                   });
             },
             updateCustomFields($event) {
                 this.password.customFields = $event;
@@ -306,10 +303,16 @@
             }
         }
 
+        select,
         input {
-            font-size   : 1rem;
-            font-weight : 300;
-            border      : none;
+            font-size        : 1rem;
+            font-weight      : 300;
+            border           : none;
+            background-color : transparent;
+        }
+
+        select {
+            padding-left: 0;
         }
 
         .content {
@@ -399,9 +402,9 @@
                     }
 
                     label {
-                        padding: 0 .5rem;
-                        font-weight: 300;
-                        line-height: 2.5rem;
+                        padding     : 0 .5rem;
+                        font-weight : 300;
+                        line-height : 2.5rem;
                     }
                 }
             }
