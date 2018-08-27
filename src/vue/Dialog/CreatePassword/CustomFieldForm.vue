@@ -10,7 +10,9 @@
             <translate tag="option" value="url">Link</translate>
             <translate tag="option" value="file">File</translate>
         </select>
+        <icon tag="label" icon="upload" class="file-icon" v-if="showFilePicker"/>
         <input class="file-picker" type="button" @click="openNextcloudFile" v-if="showFilePicker" :disabled="!isValidName" :style="getFileButtonStyle" :value="value"/>
+        <icon tag="label" icon="pencil" class="file-icon" v-if="!showFilePicker"/>
         <input class="field-value"
                :type="getFieldType"
                :placeholder="valuePlaceholder"
@@ -28,10 +30,11 @@
     import Localisation from '@js/Classes/Localisation';
     import Translate from '@vue/Components/Translate';
     import SettingsManager from '@js/Manager/SettingsManager';
+    import Icon from "@/vue/Components/Icon";
 
     export default {
         name      : 'custom-field-form',
-        components: {Translate},
+        components: {Icon, Translate},
         props     : {
             field     : {
                 type     : Object,
@@ -49,8 +52,8 @@
                     return [];
                 }
             },
-            id   : {
-                type     : Number
+            id        : {
+                type: Number
             },
             isBlank   : {
                 type     : Boolean,
@@ -153,36 +156,42 @@
 
 <style lang="scss">
     #app-popup #passwords-create-new #custom-fields .custom-field-form {
-        display: grid;
-        grid-template-areas: "id name name delete" "type type value value";
-        grid-template-columns: 1.5rem 5.5rem 1fr 3rem;
+        display               : grid;
+        grid-template-areas   : "id name type delete" "icon value value value";
+        grid-template-columns : 1.5rem 1fr 7.5rem 3rem;
 
         .field-id {
-            padding: 1rem 0;
-            font-weight: bold;
-            font-size: 1rem;
+            padding     : 1rem 0;
+            font-weight : bold;
+            font-size   : 1rem;
         }
 
         .field-name {
-            grid-area: name;
+            grid-area : name;
             max-width : none;
-            width: 100%;
+            width     : 100%;
 
             &.error {
                 border : 1px solid $color-red;
             }
         }
-
+        .file-icon {
+            grid-area   : icon;
+            padding     : 1rem 0;
+            line-height : 1rem;
+            font-size   : 1rem;
+            text-align  : center;
+        }
         .field-type {
-            grid-area: type;
+            grid-area : type;
             max-width : none;
         }
 
         .field-value,
         .file-picker {
-            grid-area: value;
+            grid-area : value;
             max-width : none;
-            width: 100%;
+            width     : 100%;
         }
 
         .file-picker {
@@ -197,48 +206,48 @@
         }
 
         .field-button {
-            grid-area: delete;
+            grid-area : delete;
             max-width : none;
         }
 
-        @media all and (min-width: $width-medium) and (max-width: $width-large) {
+        @media all and (min-width : $width-medium) and (max-width : $width-large) {
             .field-type {
-                width     : 22%;
+                width : 22%;
             }
 
             .field-value,
             .file-picker {
-                width     : 89%;
+                width : 89%;
             }
 
             .field-button {
-                width     : 8%;
+                width : 8%;
             }
         }
 
-        @media all and (max-width: $width-small) {
+        @media all and (max-width : $width-small) {
             .field-type {
-                width     : 22.5%;
+                width : 22.5%;
             }
 
             .field-value,
             .file-picker {
-                width     : 92%;
+                width : 92%;
             }
         }
 
-        @media all and (max-width: $width-extra-small) {
+        @media all and (max-width : $width-extra-small) {
             .field-type {
-                width     : 21%;
+                width : 21%;
             }
 
             .field-value,
             .file-picker {
-                width     : 85%;
+                width : 85%;
             }
 
             .field-button {
-                width     : 12%;
+                width : 12%;
             }
         }
     }

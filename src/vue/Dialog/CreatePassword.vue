@@ -312,7 +312,8 @@
         }
 
         select {
-            padding-left: 0;
+            padding: .5rem;
+            height: auto;
         }
 
         .content {
